@@ -30,7 +30,7 @@ jobs:
         detik-install: false
         file-install: false
 
-    - name: Install the dependencies
+    - name: Install dependencies
       run: sudo yum install git podman make wget jq -y
 
     - name: Download kubectl binary
@@ -38,12 +38,17 @@ jobs:
         wget https://dl.k8s.io/${K8S_VERSION}/bin/linux/ppc64le/kubectl -O /tmp/kubectl --no-verbose
         chmod +x /tmp/kubectl
 
-    - name: Build and install kube-burner binary.
+    - name:  Build and install kube-burner binary.
       run: |
         make build
         cp bin/ppc64le/kube-burner /tmp
 
-    - name: Execute Tests
+    - name: Build container images
+      run: make images
+      env:
+        VERSION: snapshot
+
+    - name: Execute tests
       run: |
         export PATH=${PATH}:/tmp/
         make test-k8s
