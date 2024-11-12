@@ -16,9 +16,18 @@ setup_file() {
   export TEST_KUBECONFIG; TEST_KUBECONFIG=$(mktemp -d)/kubeconfig
   export TEST_KUBECONTEXT=test-context
   setup-kind
+
+  ARCH=$(uname -m)
+  # ppc64le does not support kube-virt, yet. Skip deploying the operator in this case
+  if [ "$ARCH" != "ppc64le" ]; then
+     deploy-kubevirt-operator
+  else
+     echo "Skipping test for architecture ($ARCH) - as kube-virt is unsupported."
+  fi
   create_test_kubeconfig
   setup-prometheus
-  if [[ -z "$PERFSCALE_PROD_ES_SERVER" ]]; then
+  # Opensearch is unavailable on ppc64le.
+  if [[ -z "$PERFSCALE_PROD_ES_SERVER" && "$ARCH" != "ppc64le" ]]; then
     setup-opensearch
   fi
 }
@@ -68,6 +77,13 @@ teardown_file() {
 }
 
 @test "kube-burner init: os-indexing=true; local-indexing=true; vm-latency-indexing=true" {
+  ARCH=$(uname -m)
+  # ppc64le does not support kube-virt, yet. Skip tests in this case
+  if [ "$ARCH" = "ppc64le" ]; then
+     echo "Skipping test for architecture ($ARCH) - as kube virt is unsupported."
+     return 0
+  fi
+
   export ES_INDEXING=true LOCAL_INDEXING=true ALERTING=true
   run_cmd ${KUBE_BURNER} init -c kube-burner-virt.yml --uuid="${UUID}" --log-level=debug
   check_metric_value jobSummary top2PrometheusCPU prometheusRSS vmiLatencyMeasurement vmiLatencyQuantilesMeasurement alert
