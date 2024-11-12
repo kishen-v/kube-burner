@@ -50,7 +50,7 @@ teardown() {
 teardown_file() {
   destroy-kind
   $OCI_BIN rm -f prometheus
-  if [[ -z "$PERFSCALE_PROD_ES_SERVER" ]]; then
+  if [[ -z "$PERFSCALE_PROD_ES_SERVER" && "$ARCH" != "ppc64le" ]]; then
     $OCI_BIN rm -f opensearch
   fi
 }
