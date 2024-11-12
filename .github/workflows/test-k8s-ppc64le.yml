@@ -54,7 +54,6 @@ jobs:
 
     - name: Execute tests
       run: |
-        export ES_SERVER=""
         export PATH=${PATH}:/tmp/
         make test-k8s
       env:
