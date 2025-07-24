@@ -1,0 +1,14 @@
+---
+global:
+  gc: false
+jobs:
+  - name: namespace-spawn
+    jobIterations: 1
+    preLoadImages: true
+    namespacedIterations: false
+    namespace: default
+    waitWhenFinished: true
+    podWait: false
+    objects:
+      - objectTemplate: templates/namespace.yaml
+        replicas: 10

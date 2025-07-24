@@ -1,21 +1,16 @@
 ---
 global:
-  gc: true
-  measurements:
-   - name: podLatency
+  gc: false
 jobs:
   - name: kubelet-density
     jobIterations: 25
-    qps: 2
-    burst: 2
-    preLoadImages: false
+    preLoadImages: true
     namespacedIterations: false
     namespace: kubelet-density
     waitWhenFinished: true
     podWait: false
     objects:
-
       - objectTemplate: templates/pod.yml
         replicas: 1
         inputVars:
-          containerImage: registry.k8s.io/pause:3.1
+          containerImage: registry.k8s.io/pause:3.10
